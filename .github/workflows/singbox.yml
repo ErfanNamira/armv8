@@ -1,42 +1,30 @@
 name: Update SingBox Rules
 
-# Run manually or every 12 hours
 on:
-  workflow_dispatch:
   schedule:
-    - cron: '0 */12 * * *'
-
-permissions:
-  contents: write
+    - cron: "0 */12 * * *" # every 12 hours
+  workflow_dispatch:       # manual trigger
 
 jobs:
   update-files:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: Download latest .srs files
+      - name: Download files
         run: |
           mkdir -p meta-rules-dat-sing
-          urls=(
-            https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs
-            https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs
-            https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ir.srs
-            https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/private.srs
-            https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/ir.srs
-          )
-          for url in "${urls[@]}"; do
-            file=$(basename "$url")
-            curl -fsSL "$url" -o meta-rules-dat-sing/"$file"
-          done
+          curl -L -o meta-rules-dat-sing/category-ads-all.srs "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs"
+          curl -L -o meta-rules-dat-sing/private-geosite.srs "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs"
+          curl -L -o meta-rules-dat-sing/category-ir.srs "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ir.srs"
+          curl -L -o meta-rules-dat-sing/private-geoip.srs "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/private.srs"
+          curl -L -o meta-rules-dat-sing/ir.srs "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/ir.srs"
 
-      - name: Commit & push if changed
-        uses: EndBug/add-and-commit@v9
-        with:
-          author_name: github-actions
-          author_email: github-actions@github.com
-          message: chore: update meta-rules-dat files
-          add: meta-rules-dat-sing/*
-          push: true
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add meta-rules-dat-sing/*
+          git commit -m "Update meta-rules-dat-sing files" || echo "No changes to commit"
+          git push
