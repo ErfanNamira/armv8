@@ -5,12 +5,17 @@ on:
     - cron: "0 */12 * * *" # every 12 hours
   workflow_dispatch:       # manual trigger
 
+permissions:
+  contents: write
+
 jobs:
   update-files:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download files
         run: |
