@@ -30,6 +30,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add meta-rules-dat-sing/*
-          git commit -m "Update meta-rules-dat-sing files" || echo "No changes to commit"
+          git add armv8/*
+          git commit -m "Update rules-sing files" || echo "No changes to commit"
           git push
